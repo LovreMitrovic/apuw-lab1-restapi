@@ -10,9 +10,12 @@ const admin = {name:'admin', surname:'admin', password:'admin'};
 const adminUsername = 'admin';
 const adminCredentials = Buffer.from(adminUsername + ':' + admin.password).toString('base64');
 const barkWithRecipient = {text:'bark', recipient: adminUsername};
+const barkWithoutRecipient = {text:'bark'};
 //bark with this id needs to exist in database before tests
 const barkId = 'r5p43';
 
+
+//ROUTA USERS
 describe('POST /users', function () {
     it('responds with 201 created', function (done) {
         request(app)
@@ -65,6 +68,20 @@ describe('PUT /users', function () {
             .set('Authorization', 'Basic ' + adminCredentials)
             .expect('Content-Type', /json/)
             .expect(405, done);
+    });
+});
+
+//RUTA USERS/:USERNAME
+describe('POST /users/'+adminUsername, function () {
+    it('responds with 200 ok', function (done) {
+        request(app)
+            .post('/api/users/'+adminUsername)
+            .set('Accept', 'application/json')
+            .set('Authorization', 'Basic ' + adminCredentials)
+            .send(barkWithoutRecipient)
+            .expect('Content-Type', /json/)
+            .expect('Location', /\/api\/barks\/[a-z0-9]{5}/)
+            .expect(201, done);
     });
 });
 
@@ -137,6 +154,8 @@ describe('DELETE /users/'+username, function () {
     });
 });
 
+//RUTA BARKS
+
 describe('POST /barks', function () {
     it('responds with 201 created', function (done) {
         request(app)
@@ -161,6 +180,30 @@ describe('GET /barks', function () {
             .expect(200, done);
     });
 });
+
+describe('PUT /barks', function () {
+    it('responds with 405 Not Allowed', function (done) {
+        request(app)
+            .put('/api/barks')
+            .set('Accept', 'application/json')
+            .set('Authorization', 'Basic ' + adminCredentials)
+            .expect('Content-Type', /json/)
+            .expect(405, done);
+    });
+});
+
+describe('DELETE /barks', function () {
+    it('responds with 405 Not Allowed', function (done) {
+        request(app)
+            .delete('/api/barks')
+            .set('Accept', 'application/json')
+            .set('Authorization', 'Basic ' + adminCredentials)
+            .expect('Content-Type', /json/)
+            .expect(405, done);
+    });
+});
+
+//RUTA BARKS/:BID
 
 describe('GET /barks/'+barkId, function () {
     it('responds with 200 ok', function (done) {
@@ -211,3 +254,19 @@ describe('DELETE /barks/'+barkId, function () {
             .expect(404, done);
     });
 });
+
+describe('POST /barks/'+barkId, function () {
+    it('responds with 405 Not Allowed', function (done) {
+        request(app)
+            .post('/api/barks/'+barkId)
+            .set('Accept', 'application/json')
+            .set('Authorization', 'Basic ' + adminCredentials)
+            .expect('Content-Type', /json/)
+            .expect(405, done);
+    });
+});
+
+
+//RUTA USERS/:USERNAME/BARKS
+
+//RUTA USERS/:USERNAME/BARKS/:BID

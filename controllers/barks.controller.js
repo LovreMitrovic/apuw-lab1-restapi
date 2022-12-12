@@ -9,9 +9,10 @@ const getBarks = async function (req, res) {
         return;
     }
     try{
-        let barks = await Bark.find({}).skip(offset).limit(limit);
-        const count = await Bark.countDocuments({});
-        barks = barks.map((bark) => ({...bark, author: '/api/users/' + bark.author, recipient: '/api/users/' + bark.recipient}));
+        let filter = res.locals.filter;
+        let barks = await Bark.find(filter).skip(offset).limit(limit);
+        const count = await Bark.countDocuments(filter);
+        barks = barks.map((bark) => ({text: bark.text, bid: bark.bid, author: '/api/users/' + bark.author, recipient: '/api/users/' + bark.recipient}));
         res.status(200).send({barks,
             _pagination:{_next:offset+limit <= count ? '/api/users?limit=' + limit + '&offset=' + (offset + limit) : null,
                 _prev: offset-limit >= 0 ? '/api/users?limit=' + limit + '&offset=' + (offset - limit) : null,
@@ -25,7 +26,7 @@ const postBarks = async function (req, res) {
     const author = req.user.username;
     const text = req.body.text;
     const bid = Math.random().toString(36).substring(2, 7);
-    const recipient = req.body.recipient;
+    const recipient = res.locals.recipient;
     try{
         if(!await User.exists({username: recipient})){
             res.status(400).send({message: "Bad request: such recipient does not exist"});

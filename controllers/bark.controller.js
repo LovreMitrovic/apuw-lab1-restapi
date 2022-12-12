@@ -5,7 +5,8 @@ const getBark = async function (req, res) {
     const bid = req.params.bid;
     let bark;
     try{
-        bark = await Bark.findOne({bid: bid});
+        const filter = res.locals.filter;
+        bark = await Bark.findOne(filter);
     } catch {
         res.status(500).send({message: "Internal server error"});
         return;
@@ -14,19 +15,19 @@ const getBark = async function (req, res) {
         res.status(404).send({message: "Bark not found"});
         return;
     }
-    res.status(200).send({...bark, author: '/api/users/' + bark.author, recipient: '/api/users/' + bark.recipient});
+    res.status(200).send({text: bark.text, bid: bark.bid, author: '/api/users/' + bark.author, recipient: '/api/users/' + bark.recipient});
 }
 
 const putBark = async function (req, res) {
-    const bid = req.params.bid;
+    const bid = res.locals.bid;
     const text = req.body.text;
-    const recipient = req.body.recipient;
+    const recipient = res.locals.recipient;
     const author = req.user.username;
     try{
         if(!await User.exists({username: recipient})){
             res.status(400).send({message: "Bad request: such recipient does not exist"});
         }
-        let bark = await Bark.findOne({bid: bid});
+        let bark = await Bark.findOne(res.locals.filter);
         if(!bark){
             res.status(404).send({message: "Bark not found"});
             return;
@@ -44,9 +45,8 @@ const putBark = async function (req, res) {
 }
 
 const deleteBark = async function (req, res) {
-    const bid = req.params.bid;
     try{
-        const bark = await Bark.findOne({bid});
+        const bark = await Bark.findOne(res.locals.filter);
         if(!bark){
             res.status(404).send({message: "Bark not found"});
             return;
@@ -55,7 +55,8 @@ const deleteBark = async function (req, res) {
             res.status(403).send({message: "Forbidden"});
             return;
         }
-        await Bark.deleteOne({bid: bid});
+        //await Bark.deleteOne({bid: bid});
+        await bark.deleteOne();
         res.status(200).send({message: "Bark deleted"});
     } catch (err) {
         res.status(500).send({message: "Internal server error"});
