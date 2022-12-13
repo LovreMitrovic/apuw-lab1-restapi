@@ -8,6 +8,7 @@ mongoose.connect('mongodb://localhost:27017/apuw-lab1', { useNewUrlParser: true,
 mongoose.set('strictQuery', true);
 app.use(express.json());
 app.use('/api', apiRouter);
+app.use('/', express.static('public'));
 
 app.listen(3000, () => {
   console.log('Server started on port 3000');

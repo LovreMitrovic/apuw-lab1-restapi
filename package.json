@@ -18,6 +18,8 @@
   "devDependencies": {
     "assert": "^2.0.0",
     "mocha": "^10.1.0",
-    "supertest": "^6.3.3"
+    "supertest": "^6.3.3",
+    "swagger-jsdoc": "^6.2.5",
+    "swagger-ui-express": "^4.6.0"
   }
 }

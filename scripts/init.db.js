@@ -16,10 +16,10 @@ async function init(){
     const admin = new User({...adminObj, username: adminUsername});
     await admin.save();
 
-    const barkId = 'r5p43';
+    /*const barkId = 'r5p43';
     const barkWithRecipient = {text:'bark', recipient: adminUsername};
     const bark = new Bark({...barkWithRecipient, author: adminUsername, bid: barkId});
-    await bark.save();
+    await bark.save();*/
 }
 
 init().then(() => console.log('done')).catch(err => console.log(err));
